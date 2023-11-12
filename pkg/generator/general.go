@@ -76,11 +76,10 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 			fmt.Println("Error on running query", query.Error)
 			return
 		}
-
+	 	fmt.Println(finalData)
 		if len(users) > 0 {
-			gormDB.Where("username = ?", username).Select("rx_tx_byte").First(&users)
 			for _, record := range users {
-                        	extraUsage := record.RX_TX_BYTE - usage
+                        	extraUsage := usage - record.RX_TX_BYTE
 				fmt.Printf("username %v, rx_tx: %v, usage: %v, extra: %v", username, record.RX_TX_BYTE, usage, extraUsage)
                         	gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
                         	"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
