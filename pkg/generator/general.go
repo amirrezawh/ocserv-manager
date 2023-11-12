@@ -80,7 +80,8 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 		if len(users) > 0 {
 			//gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 			//	"rx_tx_byte", usage)
-			gormDB.Model(&db.Users{}).Where("username = ?", username).UpdateColumn("rx_tx_byte", gorm.Expr("rx_tx_byte + ?", usage))
+			gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
+				"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", usage))
 
 			gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 				"rx_tx", prettyByteSize(usage))
