@@ -46,6 +46,7 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 
 	for u := 0; u < len(juser); u++ {
 	    if juser[u].Username != "(none)" {
+		fmt.Println(juser[u].RX)
 		rx_int, err := strconv.ParseUint(juser[u].RX, 10, 64)
 		if err != nil {
 			panic(err)
