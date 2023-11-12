@@ -79,10 +79,13 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 	 	fmt.Println(finalData)
 		if len(users) > 0 {
 			for _, record := range users {
-                        	extraUsage := usage - record.RX_TX_BYTE
-				fmt.Printf("username %v, rx_tx: %v, usage: %v, extra: %v", username, record.RX_TX_BYTE, usage, extraUsage)
-                        	gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
-                        	"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
+				if usage > record.RX_TX_BYTE {
+                	extraUsage := usage - record.RX_TX_BYTE
+				}else {
+					extraUsage := record.RX_TX_BYTE - usage
+				}
+                gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
+                "rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
 
 				gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 				"rx_tx", prettyByteSize(record.RX_TX_BYTE))
