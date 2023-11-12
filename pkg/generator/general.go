@@ -76,7 +76,6 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 			fmt.Println("Error on running query", query.Error)
 			return
 		}
-	 	fmt.Println(finalData)
 		if len(users) > 0 {
 			for _, record := range users {
 				if usage > record.RX_TX_BYTE {
