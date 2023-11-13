@@ -102,6 +102,7 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 			//	"rx_tx", prettyByteSize(usage))
 
 		} else {
+			fmt.Printf("Init Username: %v, Usage: %v", username, usage)
 			gormDB.Create(&db.Users{
 				Username:   username,
 				RX_TX_BYTE: usage,
