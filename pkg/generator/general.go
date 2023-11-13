@@ -82,26 +82,17 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 			for _, record := range users {
 				if usage > record.RX_TX_BYTE {
 					extraUsage := usage - record.RX_TX_BYTE
-					fmt.Printf("Usage is bigger, add %v to %v for username: %v\n", extraUsage, record.RX_TX_BYTE, username)
 					gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 						"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
-					fmt.Printf("Final usage on database is: %v for user: %v\n", record.RX_TX_BYTE, username)
 
 				} else if usage < record.RX_TX_BYTE {
 					if _, exist := lessUsers[username]; exist {
 						extraUsage := usage - lessUsers[username]
-						fmt.Printf("Usage is less, usage on db: %v, current usage: %v, extra usage is: %v for user: %v\n", record.RX_TX_BYTE, usage, extraUsage, username)
 						gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 							"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
-						fmt.Printf("*****Final usage on database is: %v for user: %v\n", record.RX_TX_BYTE, username)
 					} else {
 						lessUsers[username] = usage
 					}
-
-					//extraUsage := record.RX_TX_BYTE - usage
-
-					//gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
-					//	"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
 
 				} else {
 					fmt.Println("extra usage is 0 or something happend...")
@@ -110,8 +101,6 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 				gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 					"rx_tx", prettyByteSize(record.RX_TX_BYTE))
 			}
-			//gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
-			//	"rx_tx", prettyByteSize(usage))
 
 		} else {
 			fmt.Printf("Init Username: %v, Usage: %v", username, usage)
