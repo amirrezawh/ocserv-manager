@@ -15,6 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var lessUsers = make(map[string]uint64)
+
 func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 
 	jsonFile, err := os.Open(cfg.JsonPath)
@@ -86,11 +88,21 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 					fmt.Printf("Final usage on database is: %v for user: %v\n", record.RX_TX_BYTE, username)
 
 				} else if usage < record.RX_TX_BYTE {
-					extraUsage := record.RX_TX_BYTE - usage
-					fmt.Printf("Usage is less, usage on db: %v, current usage: %v, extra usage is: %v for user: %v\n", record.RX_TX_BYTE, usage, extraUsage, username)
-					gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
-						"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
-					fmt.Printf("*****Final usage on database is: %v for user: %v\n", record.RX_TX_BYTE, username)
+					if _, exist := lessUsers[username]; exist {
+						extraUsage := usage - lessUsers[username]
+						fmt.Printf("Usage is less, usage on db: %v, current usage: %v, extra usage is: %v for user: %v\n", record.RX_TX_BYTE, usage, extraUsage, username)
+						gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
+							"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
+						fmt.Printf("*****Final usage on database is: %v for user: %v\n", record.RX_TX_BYTE, username)
+					} else {
+						lessUsers[username] = usage
+					}
+
+					//extraUsage := record.RX_TX_BYTE - usage
+
+					//gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
+					//	"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
+
 				} else {
 					fmt.Println("extra usage is 0 or something happend...")
 				}
