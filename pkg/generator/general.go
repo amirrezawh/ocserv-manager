@@ -45,29 +45,29 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 	var users []db.Users
 
 	for u := 0; u < len(juser); u++ {
-	    if juser[u].Username != "(none)" && juser[u].RX != "" && juser[u].TX != "" {
-		rx_int, err := strconv.ParseUint(juser[u].RX, 10, 64)
-		if err != nil {
-			panic(err)
-		}
+		if juser[u].Username != "(none)" && juser[u].RX != "" && juser[u].TX != "" {
+			rx_int, err := strconv.ParseUint(juser[u].RX, 10, 64)
+			if err != nil {
+				panic(err)
+			}
 
-		tx_int, err := strconv.ParseUint(juser[u].TX, 10, 64)
-		if err != nil {
-			panic(err)
-		}
+			tx_int, err := strconv.ParseUint(juser[u].TX, 10, 64)
+			if err != nil {
+				panic(err)
+			}
 
-		// Check reset Day
-		currentDate := time.Now()
-		if currentDate.Day() == 1 && !resetDay {
-			finalData[juser[u].Username] = 0
-			resetDay = true
+			// Check reset Day
+			currentDate := time.Now()
+			if currentDate.Day() == 1 && !resetDay {
+				finalData[juser[u].Username] = 0
+				resetDay = true
+			}
+			if currentDate.Day() != 1 {
+				finalData[juser[u].Username] += rx_int
+				finalData[juser[u].Username] += tx_int
+				resetDay = false
+			}
 		}
-		if currentDate.Day() != 1 {
-			finalData[juser[u].Username] += rx_int
-			finalData[juser[u].Username] += tx_int
-			resetDay = false
-		}
-	}
 
 	}
 
@@ -78,20 +78,19 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 		}
 		if len(users) > 0 {
 			for _, record := range users {
-			if usage >= record.RX_TX_BYTE {
-			fmt.Println("Usageeeeeeeeeee")
+				if usage >= record.RX_TX_BYTE {
+					extraUsage := usage - record.RX_TX_BYTE
 
-                	extraUsage := usage - record.RX_TX_BYTE
+					fmt.Printf("username: %v, extra: %v, usage: %v", username, extraUsage, usage)
 					gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 						"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
-				}else {
-					fmt.Println("Nooooooooooo")
+				} else {
 					gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 						"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", usage))
 				}
 
 				gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
-				"rx_tx", prettyByteSize(record.RX_TX_BYTE))
+					"rx_tx", prettyByteSize(record.RX_TX_BYTE))
 			}
 			//gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
 			//	"rx_tx", prettyByteSize(usage))
