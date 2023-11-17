@@ -3,4 +3,5 @@
 ** Fix auto change of variables -- DONE
 1- Add interval to run occtl command and read json command -- DONE
 2- Disable user after its reached the limit -- DONE
+** Fixed data usage bug
 ---

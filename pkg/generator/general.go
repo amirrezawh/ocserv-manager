@@ -82,14 +82,18 @@ func dataGenerator(cfg *config.GeneralConfig, resetDay bool) {
 			for _, record := range users {
 				if usage > record.RX_TX_BYTE {
 					extraUsage := usage - record.RX_TX_BYTE
-					gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
-						"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
+					if q := gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
+						"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage)); q.Error != nil {
+						fmt.Println("Error on running query", q.Error)
+					}
 
 				} else if usage < record.RX_TX_BYTE {
 					lessUsers[username] = usage
 					extraUsage := usage - lessUsers[username]
-					gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
-						"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage))
+					if q := gormDB.Model(&db.Users{}).Where("username = ?", username).Update(
+						"rx_tx_byte", gorm.Expr("rx_tx_byte + ?", extraUsage)); q.Error != nil {
+						fmt.Println("Error on running query", q.Error)
+					}
 
 				} else {
 					fmt.Println("extra usage is 0 or something happend...")
